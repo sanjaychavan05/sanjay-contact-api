@@ -1,7 +1,8 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { Resend } from "https://esm.sh/resend@4.0.0";
 
-const resend = new Resend(Deno.env.get("RESEND_API_KEY") || "re_JsejEPQz_7xtNM6XZKQh9fUMA15jMZS5u");
+const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+
 
 serve(async (req: Request) => {
   try {
