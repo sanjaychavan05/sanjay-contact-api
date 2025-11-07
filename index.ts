@@ -1,44 +1,27 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "https://esm.sh/resend@4.0.0";
 
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+const resend = new Resend(Deno.env.get("RESEND_API_KEY") || "re_JsejEPQz_7xtNM6XZKQh9fUMA15jMZS5u");
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
-
-interface ContactEmailRequest {
-  name: string;
-  email: string;
-  message: string;
-}
-
-const handler = async (req: Request): Promise<Response> => {
-  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
-
+export default async (req: Request) => {
   try {
-    const { name, email, message }: ContactEmailRequest = await req.json();
+    const { name, email, message } = await req.json();
 
-    const emailResponse = await resend.emails.send({
+    const data = await resend.emails.send({
       from: "Portfolio Contact <onboarding@resend.dev>",
-      to: ["sanjaychavan487652@gmail.com"],
-      replyTo: email,
-      subject: `New Contact Form Message from ${name}`,
-      html: `<p><b>Email:</b> ${email}</p><p>${message}</p>`,
+      to: "sanjaychavan487652@gmail.com",
+      subject: `Message from ${name}`,
+      text: `Email: ${email}\n\nMessage:\n${message}`,
     });
 
-    return new Response(JSON.stringify({ success: true, data: emailResponse }), {
-      status: 200,
-      headers: { "Content-Type": "application/json", ...corsHeaders },
+    return new Response(JSON.stringify({ success: true, data }), {
+      headers: { "Content-Type": "application/json" },
     });
-  } catch (error: any) {
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: { "Content-Type": "application/json", ...corsHeaders },
+  } catch (error) {
+    return new Response(JSON.stringify({ success: false, error: error.message }), {
+      headers: { "Content-Type": "application/json" },
     });
   }
 };
+
 
 serve(handler);
