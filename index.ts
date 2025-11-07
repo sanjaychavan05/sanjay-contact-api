@@ -1,8 +1,9 @@
+import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { Resend } from "https://esm.sh/resend@4.0.0";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY") || "re_JsejEPQz_7xtNM6XZKQh9fUMA15jMZS5u");
 
-export default async (req: Request) => {
+serve(async (req: Request) => {
   try {
     const { name, email, message } = await req.json();
 
@@ -19,9 +20,7 @@ export default async (req: Request) => {
   } catch (error) {
     return new Response(JSON.stringify({ success: false, error: error.message }), {
       headers: { "Content-Type": "application/json" },
+      status: 500,
     });
   }
-};
-
-
-serve(handler);
+});
